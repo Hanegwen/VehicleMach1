@@ -8,31 +8,39 @@ public class VehicleMovement : MonoBehaviour
 
     bool CanJump = true;
     float JumpCooldownTime = 3f;
-    float currentFuel = 100;
-    float maxFuel = 100;
+    public float currentFuel = 0;
+    public float maxFuel;
     float fuelRechargeRate = 1;
     float jumpSeed = 1;
     float fallSpeed = 1;
 
     float maxSpeed = 100;
-    float currentSpeed = 0;
+    public float currentSpeed = 0;
     float accelerationSpeed = 1;
 
     float turnSpeed = 50;
 
     bool EngineIsOn = false;
     bool canFall = false;
+
+    bool hitCheck = false;
+    private void Awake()
+    {
+        maxFuel = 40;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
+        currentFuel = maxFuel;
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
         {
             EngineIsOn = true;
         }
@@ -41,36 +49,30 @@ public class VehicleMovement : MonoBehaviour
             EngineIsOn = false;
         }
 
-        if(Input.GetKey(KeyCode.UpArrow))
+        if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey())
         {
             MoveForwards();
         }
 
-        if(Input.GetKey(KeyCode.DownArrow))
+        if(Input.GetKey(KeyCode.DownArrow) || Input.GetKey())
         {
             MoveBackwards();
         }
 
-        if(Input.GetKey(KeyCode.LeftArrow))
+        if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey())
         {
             TurnRight();
         }
 
-        if(Input.GetKey(KeyCode.RightArrow))
+        if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey())
         {
             TurnLeft();
         }
 
-        if(Input.GetKey(KeyCode.Space))
+        if(Input.GetKey(KeyCode.Space) & currentFuel > 0)
         {
             ActivateJump();
         }
-
-        if(Input.GetKeyUp(KeyCode.Space))
-        {
-            canFall = true;
-        }
-
         else
         {
             if(currentFuel + fuelRechargeRate < maxFuel)
@@ -78,6 +80,17 @@ public class VehicleMovement : MonoBehaviour
                 currentFuel += fuelRechargeRate;
             }
         }
+
+        if(currentFuel == 0)
+        {
+            canFall = true;
+        }
+
+        if(Input.GetKeyUp(KeyCode.Space))
+        {
+            canFall = true;
+        }
+
 
         AdjustCurrentSpeed();
         FallDown();
@@ -135,15 +148,19 @@ public class VehicleMovement : MonoBehaviour
         {
             this.transform.position = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + jumpSeed, this.gameObject.transform.position.z);
 
-            currentFuel -= fuelRechargeRate;
+            currentFuel -= 1;
+            print("Current Fuel: " + currentFuel);
         }
     }
 
     void FallDown()
     {
-        if(canFall)
+        if (!hitCheck)
         {
-            this.transform.position = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y - fallSpeed, this.gameObject.transform.position.z);
+            if (canFall)
+            {
+                this.transform.position = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y - fallSpeed, this.gameObject.transform.position.z);
+            }
         }
     }
 
@@ -157,5 +174,11 @@ public class VehicleMovement : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         canFall = false;
+        hitCheck = true;
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        hitCheck = false;
     }
 }
