@@ -12,6 +12,7 @@ public class VehicleMovement : MonoBehaviour
     float maxFuel = 100;
     float fuelRechargeRate = 1;
     float jumpSeed = 1;
+    float fallSpeed = 1;
 
     float maxSpeed = 100;
     float currentSpeed = 0;
@@ -20,6 +21,7 @@ public class VehicleMovement : MonoBehaviour
     float turnSpeed = 50;
 
     bool EngineIsOn = false;
+    bool canFall = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -64,6 +66,11 @@ public class VehicleMovement : MonoBehaviour
             ActivateJump();
         }
 
+        if(Input.GetKeyUp(KeyCode.Space))
+        {
+            canFall = true;
+        }
+
         else
         {
             if(currentFuel + fuelRechargeRate < maxFuel)
@@ -73,6 +80,7 @@ public class VehicleMovement : MonoBehaviour
         }
 
         AdjustCurrentSpeed();
+        FallDown();
     }
 
     void AdjustCurrentSpeed()
@@ -131,10 +139,23 @@ public class VehicleMovement : MonoBehaviour
         }
     }
 
+    void FallDown()
+    {
+        if(canFall)
+        {
+            this.transform.position = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y - fallSpeed, this.gameObject.transform.position.z);
+        }
+    }
+
     IEnumerator JumpCooldown()
     {
         yield return new WaitForSeconds(JumpCooldownTime);
         
 
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        canFall = false;
     }
 }
