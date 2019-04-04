@@ -24,6 +24,8 @@ public class VehicleMovement : MonoBehaviour
     bool canFall = false;
 
     bool hitCheck = false;
+
+    bool forward = true;
     private void Awake()
     {
         maxFuel = 40;
@@ -39,6 +41,15 @@ public class VehicleMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (forward)
+        {
+            transform.Translate(Vector3.forward * Time.deltaTime * currentSpeed);
+        }
+        else
+        {
+            transform.Translate(Vector3.forward * Time.deltaTime * currentSpeed * -1);
+
+        }
 
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
         {
@@ -49,22 +60,22 @@ public class VehicleMovement : MonoBehaviour
             EngineIsOn = false;
         }
 
-        if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey())
+        if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
-            MoveForwards();
+            forward = true;
         }
 
-        if(Input.GetKey(KeyCode.DownArrow) || Input.GetKey())
+        if(Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
-            MoveBackwards();
+            forward = false;
         }
 
-        if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey())
+        if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             TurnRight();
         }
 
-        if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey())
+        if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             TurnLeft();
         }
@@ -136,11 +147,7 @@ public class VehicleMovement : MonoBehaviour
         //rigidbody.AddForce((Vector3.back * maxSpeed),ForceMode.Acceleration);
     }
 
-    void MoveForwards()
-    {
-        transform.Translate(Vector3.forward * Time.deltaTime * currentSpeed);
-        //rigidbody.velocity = Vector3.forward * maxSpeed;
-    }
+
 
     void ActivateJump()
     {
